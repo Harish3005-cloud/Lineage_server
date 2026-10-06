@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 
 from app.db.database import engine, Base, get_db
-import app.db.models.user  # registers User model on Base
+import app.db.models  # registers User, Project, ProjectMember on Base
 from app.api.api import api_router
 
 @asynccontextmanager

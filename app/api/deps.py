@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.core.security import decode_access_token
 from app.db.database import get_db
 from app.db.models.user import User, UserRole
+from app.db.models.project_member import ProjectMember, MembershipStatus
 
 bearer_scheme = HTTPBearer(auto_error=False)
 
@@ -57,3 +58,23 @@ def require_role(*allowed_roles: UserRole) -> Callable[[User], User]:
             )
         return current_user
     return role_checker
+
+def require_project_member(
+    project_id: UUID,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> ProjectMember:
+    membership = (
+        db.query(ProjectMember)
+        .filter(
+            ProjectMember.project_id == project_id,
+            ProjectMember.user_id == current_user.user_id,
+        )
+        .first()
+    )
+    if not membership or membership.status != MembershipStatus.ACCEPTED:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not an accepted member of this project",
+        )
+    return membership
