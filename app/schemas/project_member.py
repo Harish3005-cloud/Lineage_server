@@ -4,18 +4,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field
 from app.db.models.project_member import ProjectRole, MembershipStatus
 
-class ProjectCreate(BaseModel):
-    title: str = Field(..., min_length=1, max_length=255, description="Project title")
-    description: Optional[str] = Field(None, description="Project description")
-
-class ProjectResponse(BaseModel):
-    project_id: UUID
-    title: str
-    description: Optional[str] = None
-    sponsor_id: UUID
-    created_at: datetime
-
-    model_config = ConfigDict(from_attributes=True)
+from app.schemas.project import ProjectCreate, ProjectResponse
 
 class ProjectMemberApply(BaseModel):
     role: Optional[ProjectRole] = Field(None, description="Requested project role, defaults to mapped platform role")

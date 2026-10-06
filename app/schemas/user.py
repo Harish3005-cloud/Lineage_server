@@ -20,6 +20,12 @@ class UserCreate(BaseModel):
             raise ValueError("Public registration cannot assign the ADMIN role")
         return v
 
+class UserUpdate(BaseModel):
+    name: Optional[str] = Field(None, min_length=1, max_length=255, description="Updated full name")
+    age: Optional[int] = Field(None, ge=0, le=150, description="Updated age")
+    skills: Optional[Any] = Field(None, description="Updated skills list or object")
+    availability: Optional[str] = Field(None, max_length=255, description="Updated availability description")
+
 class UserResponse(BaseModel):
     user_id: UUID
     name: str
@@ -33,6 +39,21 @@ class UserResponse(BaseModel):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+class UserProfileResponse(UserResponse):
+    pass
+
+class StudentProfileResponse(UserProfileResponse):
+    education_level: Optional[str] = None
+
+class ExpertProfileResponse(UserProfileResponse):
+    domain_expertise: Optional[str] = None
+
+class SponsorProfileResponse(UserProfileResponse):
+    organization_name: Optional[str] = None
+
+class MentorProfileResponse(UserProfileResponse):
+    mentorship_focus: Optional[str] = None
 
 class LoginRequest(BaseModel):
     email: EmailStr
