@@ -1,9 +1,22 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import text
-from app.db.database import get_db
 
-app = FastAPI(title="LINEAGE API")
+from app.db.database import engine, Base, get_db
+import app.db.models.user  # registers User model on Base
+from app.api.api import api_router
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Ensure tables are created on startup
+    Base.metadata.create_all(bind=engine)
+    yield
+
+app = FastAPI(title="LINEAGE API", lifespan=lifespan)
+
+# Register API routes
+app.include_router(api_router)
 
 @app.get("/health")
 def health_check():
